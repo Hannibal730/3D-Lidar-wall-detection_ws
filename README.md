@@ -3,8 +3,17 @@
 
 # Real-Time Wall Detection from 3D LiDAR Data in ROS
 
-## Abstract
-**wall\_detection\_pkg** is a ROS Noetic package for real-time wall detection using 3D LiDAR data on autonomous mobile robots.  It subscribes to a Velodyne VLP-16 LiDAR point cloud (`/velodyne_points`), extracts vertical planar surfaces (walls) via PCL filters and RANSAC segmentation, and publishes wall point clouds for navigation.  Planar fitting is a common technique to detect surfaces like walls and floors in point clouds. In practice the Velodyne VLP-16 driver publishes a `sensor_msgs/PointCloud2` on `/velodyne_points`, which `wall_detect_node.cpp` processes to find walls. The complementary `wall_compress_node.cpp` then projects these walls onto the ground plane and downsamples them for compact mapping.
+This repository is for real-time wall detection using 3D LiDAR data on autonomous mobile robots.  It subscribes to a Velodyne VLP-16 LiDAR point cloud (`/velodyne_points`), extracts vertical planar surfaces (walls) via PCL filters and RANSAC segmentation, and publishes wall point clouds for navigation.  Planar fitting is a common technique to detect surfaces like walls and floors in point clouds. In practice the Velodyne VLP-16 driver publishes a `sensor_msgs/PointCloud2` on `/velodyne_points`, which `wall_detect_node.cpp` processes to find walls. The complementary `wall_compress_node.cpp` then projects these walls onto the ground plane and downsamples them for compact mapping.
+
+
+* ## Raw pointcloud
+    ![Image](https://github.com/user-attachments/assets/0d9093b6-bee6-4334-81f0-3fe982374c76)
+
+
+
+* ## Raw & Detected walls & Compressed walls
+    ![Image](https://github.com/user-attachments/assets/d5885917-0a70-46a8-8bc6-dbf568cefc94)
+
 
 ---
 <br>
@@ -34,9 +43,11 @@
 ---
 <br>
 
-## How It Works
+## Pipeline
 
-**wall\_detect\_node.cpp pipeline:**
+### (1) wall\_detect\_node.cpp
+
+![Image](https://github.com/user-attachments/assets/eb5d5b71-2520-4a21-a707-2b4c15f6c24e)
 
 1. **Subscribe to `/velodyne_points`:** Receives raw `PointCloud2` messages from the LiDAR.
 2. **VoxelGrid Filter:** Apply a PCL `VoxelGrid` filter to downsample the cloud. A 3D grid of tiny boxes is overlaid on the points and each occupied voxel is replaced by the centroid of its points.
@@ -44,7 +55,8 @@
 4. **Planar Segmentation (RANSAC):** Run `pcl::SACSegmentation` with `SACMODEL_PLANE` and `SAC_RANSAC` to find the dominant planar surface in the filtered cloud.  Points within a distance threshold of the fitted plane are marked as inliers. In effect, this extracts points belonging to the largest vertical plane (i.e., a wall) in the scene.
 5. **Publish `/detected_wall`:** The inlier points (the segmented wall) are published as a new `PointCloud2`. These points represent the detected wall surfaces in the LiDAR view.
 
-**wall\_compress\_node.cpp pipeline:**
+### (2) wall\_compress\_node.cpp
+![Image](https://github.com/user-attachments/assets/0f73d6c2-ddbe-4ac9-88de-fb0066dea0c8)
 
 1. **Subscribe to `/detected_wall`:** Receives the wall point cloud from the first node.
 2. **Project to Ground Plane:** Use PCL’s `ProjectInliers` filter with a plane model of `ax+by+cz+d=0` (with a=b=d=0, c=1) to project all points onto the z=0 (XY) plane. This “flattens” the wall into 2D by setting all z-coordinates to 0.
