@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <pcl_conversions/pcl_conversions.h>         // ROS ↔ PCL 메시지 변환
+#include <pcl_conversions/pcl_conversions.h>      
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/filters/voxel_grid.h>
@@ -81,8 +81,8 @@ private:
             float nz = plane_normal[2];
 
             // 평면 법선의 Z성분을 확인하여 수직에 가까운지 판단
+            // ±10° 이내로 수직인 평면만 벽으로 간주 
             bool isWall = (std::fabs(nz) < 0.1736f);     // 0.1736 ≈ cos(80°), |nz| < 0.1736이면 법선이 거의 수평 -> 평면은 거의 수직
-            // [변경] ±10° 이내로 수직인 평면만 벽으로 간주 (벽은 Z축 대비 수직, 법선의 Z성분이 작음):contentReference[oaicite:8]{index=8}
 
             if (isWall) {
                 // 벽 평면으로 확인된 경우: 인라이어 점들을 추출하여 wall_cloud에 누적
