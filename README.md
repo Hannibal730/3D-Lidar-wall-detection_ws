@@ -1,5 +1,7 @@
 
-# Detect walls by using 3D Lidar sensor
+![Visitor Badge](https://visitor-badge.laobi.icu/badge?page_id=Hannibal730.3D-Lidar-wall-detection_ws_ws)
+
+# Real-Time Wall Detection from 3D LiDAR Data in ROS
 
 ## Abstract
 **wall\_detection\_pkg** is a ROS Noetic package for real-time wall detection using 3D LiDAR data on autonomous mobile robots.  It subscribes to a Velodyne VLP-16 LiDAR point cloud (`/velodyne_points`), extracts vertical planar surfaces (walls) via PCL filters and RANSAC segmentation, and publishes wall point clouds for navigation.  Planar fitting is a common technique to detect surfaces like walls and floors in point clouds. In practice the Velodyne VLP-16 driver publishes a `sensor_msgs/PointCloud2` on `/velodyne_points`, which `wall_detect_node.cpp` processes to find walls. The complementary `wall_compress_node.cpp` then projects these walls onto the ground plane and downsamples them for compact mapping.
