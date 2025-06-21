@@ -7,7 +7,7 @@ This repository is for real-time wall detection using 3D LiDAR data on autonomou
 
 
 * ## Raw pointcloud
-    ![Image](https://github.com/user-attachments/assets/fe78fc87-8d9d-4530-b431-2a52c6f59597)
+    ![Image](https://github.com/user-attachments/assets/a13de885-5d0b-4c22-9a26-8bcbd6c83b6e)
 
 
 
