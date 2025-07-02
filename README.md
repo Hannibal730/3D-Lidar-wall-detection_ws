@@ -50,8 +50,8 @@ This repository is for real-time wall detection using 3D LiDAR data on autonomou
 ![Image](https://github.com/user-attachments/assets/eb5d5b71-2520-4a21-a707-2b4c15f6c24e)
 
 1. **Subscribe to `/velodyne_points`:** Receives raw `PointCloud2` messages from the LiDAR.
-2. **VoxelGrid Filter:** Apply a PCL `VoxelGrid` filter to downsample the cloud. A 3D grid of tiny boxes is overlaid on the points and each occupied voxel is replaced by the centroid of its points.
-3. **Height (PassThrough) Filter:** Use a PCL `PassThrough` filter on the z-axis to remove points outside a set height range (e.g. keep 0 m < z < 2 m). This focuses the segmentation on plausible wall heights.
+2. **VoxelGrid Filter:** Apply a PCL `ApproximateVoxelGrid` filter to downsample the cloud. A 3D grid of tiny boxes is overlaid on the points and each occupied voxel is replaced by the centroid of its points.
+3. **ROI (PassThrough) Filter:** Use a PCL `PassThrough` filter on the x, y, z-axis to remove points out of ROI (e.g. keep 0 m < z < 2 m). This focuses the segmentation on plausible walls.
 4. **Planar Segmentation (RANSAC):** Run `pcl::SACSegmentation` with `SACMODEL_PLANE` and `SAC_RANSAC` to find the dominant planar surface in the filtered cloud.  Points within a distance threshold of the fitted plane are marked as inliers. In effect, this extracts points belonging to the largest vertical plane (i.e., a wall) in the scene.
 5. **Publish `/detected_wall`:** The inlier points (the segmented wall) are published as a new `PointCloud2`. These points represent the detected wall surfaces in the LiDAR view.
 
@@ -60,10 +60,10 @@ This repository is for real-time wall detection using 3D LiDAR data on autonomou
 
 1. **Subscribe to `/detected_wall`:** Receives the wall point cloud from the first node.
 2. **Project to Ground Plane:** Use PCL’s `ProjectInliers` filter with a plane model of `ax+by+cz+d=0` (with a=b=d=0, c=1) to project all points onto the z=0 (XY) plane. This “flattens” the wall into 2D by setting all z-coordinates to 0.
-3. **VoxelGrid Downsampling:** Apply another `VoxelGrid` filter (with a leaf size of 0.03 m) to the projected points. This coarsely downsampled grid significantly reduces the number of points while preserving the wall outline.
+3. **VoxelGrid Downsampling:** Apply another `ApproximateVoxelGrid` filter to the projected points. This coarsely downsampled grid significantly reduces the number of points while preserving the wall outline.
 4. **Publish `/compressed_wall`:** The result is a sparse 2D representation of the wall, published as `PointCloud2`. This compressed wall map is useful for real-time navigation or mapping (e.g., as a costmap or occupancy grid).
 
-Each step uses standard PCL/ROS filters (e.g. `pcl_ros::VoxelGrid`, `pcl_ros::PassThrough`, `pcl_ros::SACSegmentation`, `pcl_ros::ProjectInliers`).
+Each step uses standard PCL/ROS filters (e.g. `pcl_ros::ApproximateVoxelGrid`, `pcl_ros::PassThrough`, `pcl_ros::SACSegmentation`, `pcl_ros::ProjectInliers`).
 
 ---
 <br>
