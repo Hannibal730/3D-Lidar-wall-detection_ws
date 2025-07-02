@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(wall_detection_pkg)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -31,5 +32,9 @@ add_executable(wall_compress_node src/wall_compress_node.cpp)
 target_link_libraries(wall_compress_node ${catkin_LIBRARIES})
 
 install(TARGETS wall_detect_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS wall_compress_node           # wall_compress_node 도 함께 설치
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
